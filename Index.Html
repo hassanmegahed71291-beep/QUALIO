@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>بوت التدريب الذكي</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Tahoma', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      background: #f0f2f5;
+    }
+    .sidebar {
+      width: 25%;
+      background: #2c3e50;
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .sidebar .info {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .header {
+      background: #3498db;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .chatbox {
+      flex: 1;
+      margin: 20px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .bot {
+      background: #e8f6ff;
+      text-align: left;
+    }
+    .user {
+      background: #dfffd8;
+      text-align: right;
+    }
+    .input-area {
+      display: flex;
+      padding: 10px;
+      background: #ecf0f1;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .input-area button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #3498db;
+      color: #fff;
+      cursor: pointer;
+    }
+    .quiz-button {
+      display: block;
+      margin: 5px 0;
+      padding: 10px;
+      background: #2ecc71;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .quiz-button:hover {
+      background: #27ae60;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div>
+      <h2>📊 لوحة المتدرب</h2>
+      <div class="info" id="traineeName">👤 الاسم: غير مسجل</div>
+      <div class="info" id="score">⭐ النقاط: 0</div>
+      <div class="info" id="motivation">💡 النصيحة: الإتقان هو طريق الجودة</div>
+    </div>
+    <div style="text-align:center; font-size:12px; opacity:0.7;">
+      © Hassan Megahed – تدريب الجودة
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      بوت التدريب الذكي – Hassan Megahed مدير الجودة AQL
+    </div>
+
+    <div class="chatbox" id="chatbox">
+      <div class="message bot">
+        مرحبًا بكم في بوت التدريب الذكي ✨<br>
+        أنا <b>Hassan Megahed – مدير الجودة AQL</b>، يسعدني وجودكم هنا.<br>
+        هدفنا معًا هو رفع مستوى الجودة وتحقيق أفضل أداء للفريق.<br><br>
+        من فضلك اكتب اسمك لتسجيل حضورك 👇
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="اكتب اسمك هنا...">
+      <button onclick="sendMessage()">إرسال</button>
+    </div>
+  </div>
+
+  <script>
+    let userName = "";
+    let score = 0;
+    const tips = [
+      "النظافة تعكس احترافك ✨",
+      "كل تفصيلة صغيرة تصنع فرقًا كبيرًا",
+      "الإتقان هو طريق الجودة",
+      "الترتيب أساس النجاح",
+      "الجودة تبدأ من التفاصيل"
+    ];
+
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatbox = document.getElementById("chatbox");
+      const message = input.value.trim();
+
+      if (message !== "") {
+        if (userName === "") {
+          userName = message;
+          document.getElementById("traineeName").innerText = "👤 الاسم: " + userName;
+          chatbox.innerHTML += `
+            <div class="message user">${message}</div>
+            <div class="message bot">أهلاً يا ${userName} 👋، خلينا نبدأ التدريب معًا.</div>
+
+            <div class="message bot">🎯 اختبار سريع: ما معنى AQL؟</div>
+            <button class="quiz-button" onclick="checkAnswer(true)">AQL = مستوى الجودة المقبول</button>
+            <button class="quiz-button" onclick="checkAnswer(false)">AQL = عدد القطع المنتجة</button>
+          `;
+        } else {
+          chatbox.innerHTML += `<div class="message user">${message}</div>`;
+          chatbox.innerHTML += `<div class="message bot">تمام يا ${userName}، هنكمل التدريب خطوة بخطوة ✨</div>`;
+        }
+        input.value = "";
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+    }
+
+    function checkAnswer(correct) {
+      const chatbox = document.getElementById("chatbox");
+      if (correct) {
+        score++;
+        document.getElementById("score").innerText = "⭐ النقاط: " + score;
+        chatbox.innerHTML += `<div class="message bot">✅ إجابة صحيحة! مجموع نقاطك الآن: ${score}</div>`;
+      } else {
+        chatbox.innerHTML += `<div class="message bot">❌ إجابة خاطئة، حاول مرة أخرى.</div>`;
+      }
+      // عرض نصيحة عشوائية
+      const randomTip = tips[Math.floor(Math.random() * tips.length)];
+      document.getElementById("motivation").innerText = "💡 النصيحة: " + randomTip;
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
