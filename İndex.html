@@ -1,0 +1,327 @@
+import { useState, useRef, useEffect } from "react";
+
+const DEFECTS = {
+  jacket:[
+    ["Wrong Size","خطأ في المقاس","Critical"],["Wrong Style","موديل غلط","Critical"],["Wrong Fabric/Color","قماش أو لون غلط","Critical"],
+    ["Open Seam","خياطة مفتوحة","Major"],["Broken Stitches","خيوط مقطوعة","Major"],["Uneven Stitching","خياطة غير منتظمة","Major"],
+    ["Puckering","تجعد في الخياطة","Major"],["Collar Misalignment","كولر غير مستوي","Major"],["Lapel Misalignment","لابيل غير مستوي","Major"],
+    ["Sleeve Length Variation","تفاوت طول الكم","Major"],["Missing Button","زرار ناقص","Major"],["Loose Button","زرار مفكوك","Major"],
+    ["Open Button Hole","فتحة زرار مفتوحة","Major"],["Lining Defect","عيب في البطانة","Major"],["Pocket Misalignment","جيب غير مستوي","Major"],
+    ["Thread Trimming","خيوط زيادة","Minor"],["Stain","بقعة","Minor"],["Dust/Dirt","غبار/اتساخ","Minor"],
+    ["Oil Stain","بقعة زيت","Minor"],["Iron Mark","أثر المكواة","Minor"],["Wrong Label","لافتة غلط","Minor"],
+  ],
+  trouser:[
+    ["Wrong Size","خطأ في المقاس","Critical"],["Wrong Style","موديل غلط","Critical"],["Wrong Fabric/Color","قماش أو لون غلط","Critical"],
+    ["Open Seam","خياطة مفتوحة","Major"],["Broken Stitches","خيوط مقطوعة","Major"],["Uneven Stitching","خياطة غير منتظمة","Major"],
+    ["Waistband Misalignment","حزام غير مستوي","Major"],["Faulty Zipper","سحاب معيب","Major"],["Open Hem","حاشية مفتوحة","Major"],
+    ["Leg Length Variation","تفاوت طول الرجل","Major"],["Missing Button","زرار ناقص","Major"],["Uneven Belt Loops","لوبات غير منتظمة","Major"],
+    ["Pocket Misalignment","جيب غير مستوي","Major"],["Puckering","تجعد في الخياطة","Major"],["Misaligned Zipper","سحاب غير مستوي","Major"],
+    ["Thread Trimming","خيوط زيادة","Minor"],["Stain","بقعة","Minor"],["Dust/Dirt","غبار/اتساخ","Minor"],
+    ["Oil Stain","بقعة زيت","Minor"],["Iron Mark","أثر المكواة","Minor"],["Wrong Label","لافتة غلط","Minor"],
+  ]
+};
+
+const SAMPLE_TABLE=[[2,8,2],[9,15,3],[16,25,5],[26,50,8],[51,90,13],[91,150,20],[151,280,32],[281,500,50],[501,1200,80],[1201,3200,125],[3201,10000,200]];
+
+const QUIZ=[
+  {q:"ما معنى AQL؟",opts:["Acceptable Quality Level","Advanced Quality List","Annual Quality Limit","Actual Quality Level"],ans:0,exp:"AQL = Acceptable Quality Level — مستوى الجودة المقبول."},
+  {q:"قيمة AQL للعيوب Critical؟",opts:["AQL 2.5","AQL 4.0","AQL 0 — Zero Tolerance","AQL 1.0"],ans:2,exp:"Critical = AQL 0، أي عيب واحد = رفض فوري."},
+  {q:"قيمة AQL للعيوب Major؟",opts:["AQL 0","AQL 1.5","AQL 2.5","AQL 6.5"],ans:2,exp:"Major = AQL 2.5 عادةً."},
+  {q:"قيمة AQL للعيوب Minor؟",opts:["AQL 2.5","AQL 4.0","AQL 10","AQL 0"],ans:1,exp:"Minor = AQL 4.0 عادةً."},
+  {q:"شحنة 300 قطعة، كام قطعة تفحص؟",opts:["20","32","50","80"],ans:2,exp:"281–500 قطعة → عينة 50 قطعة."},
+  {q:"شحنة 1000 قطعة، كام قطعة تفحص؟",opts:["50","80","125","200"],ans:1,exp:"501–1200 → عينة 80 قطعة."},
+  {q:"إيه مثال على عيب Critical؟",opts:["خيوط زيادة","بقعة","خطأ في المقاس","طي غير صحيح"],ans:2,exp:"خطأ في المقاس = Critical."},
+  {q:"إيه مثال على عيب Minor؟",opts:["سحاب معيب","خياطة مفتوحة","خيوط زيادة","موديل غلط"],ans:2,exp:"خيوط زيادة = Minor."},
+  {q:"ما معنى GSM؟",opts:["General Sewing Method","Grams per Square Meter","Good Stitch Measure","Garment Size Metric"],ans:1,exp:"GSM = Grams per Square Meter — كثافة القماش."},
+  {q:"ما معنى Puckering؟",opts:["خياطة مفتوحة","تجعد حول الخياطة","لون يتغير","ناقص زرار"],ans:1,exp:"Puckering = تجعد في القماش حول خط الخياطة."},
+  {q:"ما معنى Colorfastness؟",opts:["سرعة الصباغة","ثبات اللون","نوع الصبغة","وزن اللون"],ans:1,exp:"Colorfastness = ثبات اللون عند الغسيل والاحتكاك."},
+  {q:"ما معنى Shrinkage؟",opts:["انكماش بعد الغسيل","زيادة الحجم","نوع خياطة","جودة الخيط"],ans:0,exp:"Shrinkage = انكماش القماش بعد الغسيل."},
+  {q:"ليه نسحب العينة من أماكن مختلفة؟",opts:["الفحص أسرع","تمثيل عشوائي حقيقي","نوفر وقت","مش مهم"],ans:1,exp:"السحب العشوائي يضمن تمثيل الشحنة الكاملة."},
+  {q:"ما المعيار الدولي لفحص الملابس؟",opts:["ISO 9001","ANSI/ASQC Z1.4","BS 5750","EN 13402"],ans:1,exp:"المعيار هو ANSI/ASQC Z1.4."},
+  {q:"ما مستوى الفحص القياسي؟",opts:["Level I","Level III","General Level II","Special S-1"],ans:2,exp:"General Inspection Level II هو المعيار."},
+  {q:"متى ترفض الشحنة فوراً؟",opts:["3 عيوب Minor","عيب Critical واحد","10 عيوب Major","نسبة 10%"],ans:1,exp:"Critical واحد = رفض فوري."},
+  {q:"ما معنى Pilot Run؟",opts:["فحص نهائي","دفعة تجريبية أولى","تقرير أسبوعي","التعبئة"],ans:1,exp:"Pilot Run = التشغيلة التجريبية الأولى قبل الإنتاج الكامل."},
+  {q:"ما معنى Tolerance؟",opts:["وقت الفحص","هامش التفاوت المسموح","عدد العيوب","نوع الخيوط"],ans:1,exp:"Tolerance = هامش التفاوت المسموح في القياسات."},
+  {q:"ليه النظافة جزء من الجودة؟",opts:["المدير يطلب","تمنع تلوث المنتج","شرط قانوني","لا علاقة"],ans:1,exp:"النظافة تمنع التلوث وتعكس احترافية الفريق."},
+  {q:"ما تأثير ترابيزة الفحص الغير نظيفة؟",opts:["لا تأثير","قد تسبب بقعاً","عيب Critical دائماً","الفحص أسرع"],ans:1,exp:"ترابيزة غير نظيفة قد تسبب بقعاً — عيب Minor قابل للتجنب."},
+];
+
+const TIPS=[
+  {icon:"🧹",t:"نظافة الترابيزة",b:"قبل ما تبدأ الفحص، نضّف ترابيزتك. ترابيزة نظيفة = منتج نظيف."},
+  {icon:"💡",t:"الإضاءة الصح",b:"تأكد إن الإضاءة كافية وموحدة. الإضاءة الضعيفة بتخليك تفوّت عيوب."},
+  {icon:"📏",t:"دقة القياس",b:"اضغط المتر بثبات. فرق نص سم ممكن يفرق بين Pass وFail!"},
+  {icon:"🔴",t:"Critical أولاً",b:"دور على العيوب Critical أول حاجة. لو لقيت واحدة، وقّف وبلّغ فوراً."},
+  {icon:"🎯",t:"عشوائية العينة",b:"اسحب العينة من أماكن مختلفة في الشحنة لتمثيل حقيقي."},
+  {icon:"📸",t:"توثيق العيوب",b:"صوّر كل عيب من 20-30 سم. الصورة الواضحة = دليل قوي."},
+  {icon:"👔",t:"النظافة الشخصية",b:"إيدين نظيفة ضرورة. أي اتساخ ممكن ينتقل للمنتج."},
+  {icon:"⏱️",t:"لا للتسرع",b:"الفحص السريع بيفوّت العيوب. خصّص وقت كافي لكل قطعة."},
+];
+
+function getSample(n){for(const r of SAMPLE_TABLE)if(n>=r[0]&&n<=r[1])return r[2];return 200;}
+
+export default function AQLBot(){
+  const [tab,setTab]=useState("chat");
+  const [garment,setGarment]=useState("jacket");
+  const [messages,setMessages]=useState([{role:"bot",text:"أهلاً يا فريق Alpha Omega! 👋\n\nأنا AQL Assistant بتاع Hassan مدير الجودة.\n\nاسألني أي سؤال عن الجودة، AQL، العيوب، الملابس، أو أي حاجة تانية — وهجاوب فوراً! 🤖\n\nأو اختار تاب من فوق."}]);
+  const [input,setInput]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [quizState,setQuizState]=useState({active:false,score:0,used:[],answered:false,name:"",current:0,done:false,chosen:null});
+  const [tipIdx,setTipIdx]=useState(0);
+  const [nameInput,setNameInput]=useState("");
+  const [showNameInput,setShowNameInput]=useState(false);
+  const [cert,setCert]=useState(null);
+  const bottomRef=useRef(null);
+
+  useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages,loading]);
+
+  const addMsg=(role,text)=>setMessages(m=>[...m,{role,text}]);
+
+  const SYSTEM=`أنت مساعد خبير في مراقبة الجودة لشركة Alpha Omega Egypt لصناعة الملابس في مصر.
+خبرتك تشمل: نظام AQL، عيوب الملابس (جاكيت، بنطلون، قميص، فستان، معطف، يونيفورم)، جودة الأقمشة، GSM، ثبات اللون، الانكماش، ISO 9001، أدوات الفحص، معايير القياس، والنظافة في بيئة الإنتاج.
+أجب على أي سؤال يطرحه الفريق بشكل واضح ومفيد. لا تقل أبداً "لا أعرف" — دائماً قدّم إجابة مفيدة.
+قواعد: أجب بالعربية دائماً. كن واضحاً ومختصراً للموبايل. صنّف العيوب Critical/Major/Minor عند الحاجة.`;
+
+  async function askClaude(msg){
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:800,
+        system:SYSTEM,
+        messages:[{role:"user",content:msg}]
+      })
+    });
+    const data=await res.json();
+    return data.content[0].text;
+  }
+
+  function quickAnswer(msg){
+    const m=msg.toLowerCase().trim();
+    const num=msg.match(/^\s*(\d+)\s*$/);
+    if(num){
+      const n=parseInt(num[1]);
+      if(n>0&&n<=10000){const s=getSample(n);return `📐 شحنة ${n} قطعة\nحجم العينة = ${s} قطعة\n🔴 Critical: 0 مسموح\n🟠 Major (AQL 2.5)\n🟡 Minor (AQL 4.0)`;}
+    }
+    const found=DEFECTS[garment].filter(d=>d[0].toLowerCase().includes(m)||d[1].includes(msg));
+    if(found.length&&m.length<20) return "🔍 نتائج البحث:\n"+found.map(d=>`• ${d[0]} — ${d[1]} [${d[2]}]`).join("\n");
+    return null;
+  }
+
+  async function send(){
+    if(!input.trim()||loading)return;
+    const msg=input.trim();
+    setInput("");
+    addMsg("user",msg);
+    const quick=quickAnswer(msg);
+    if(quick){addMsg("bot",quick);return;}
+    setLoading(true);
+    try{
+      const reply=await askClaude(msg);
+      addMsg("bot",reply);
+    }catch(e){
+      addMsg("bot","⚠️ حدث خطأ. تأكد من الاتصال وحاول مرة أخرى.");
+    }finally{setLoading(false);}
+  }
+
+  function startQuiz(){setShowNameInput(true);setTab("quiz");}
+  function beginQuiz(){
+    const nm=nameInput.trim()||"عضو الفريق";
+    const first=Math.floor(Math.random()*QUIZ.length);
+    setQuizState({active:true,score:0,used:[],answered:false,name:nm,current:first,done:false,chosen:null});
+    setShowNameInput(false);
+  }
+  function nextQuiz(){
+    const remaining=QUIZ.map((_,i)=>i).filter(i=>!quizState.used.includes(i));
+    if(remaining.length===0){
+      const pct=Math.round((quizState.score/QUIZ.length)*100);
+      if(pct>=80)setCert({name:quizState.name,score:quizState.score,total:QUIZ.length,pct,date:new Date().toLocaleDateString("ar-EG")});
+      setQuizState(s=>({...s,done:true}));return;
+    }
+    const next=remaining[Math.floor(Math.random()*remaining.length)];
+    setQuizState(s=>({...s,current:next,answered:false,chosen:null}));
+  }
+
+  const bClr={Critical:"#ff4757",Major:"#ff6b35",Minor:"#ffa502"};
+  const bTxt={Critical:"#fff",Major:"#fff",Minor:"#000"};
+
+  const st={
+    wrap:{background:"#1a1a2e",minHeight:"100vh",fontFamily:"'Segoe UI',Tahoma,Arial,sans-serif",direction:"rtl",display:"flex",flexDirection:"column",maxWidth:500,margin:"0 auto"},
+    hdr:{background:"linear-gradient(135deg,#16213e,#0f3460)",padding:"10px 14px 8px",textAlign:"center",borderBottom:"2px solid #e94560"},
+    logo:{fontSize:17,fontWeight:700,background:"linear-gradient(90deg,#e94560,#a8edea)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"},
+    h1:{fontSize:"1rem",color:"#fff",fontWeight:700,margin:"2px 0"},
+    sub:{fontSize:".72rem",color:"#a0b4d0"},
+    tabs:{display:"flex",background:"#16213e",borderBottom:"1px solid #2a3a5c"},
+    tab:(a)=>({flex:1,padding:"10px 2px",textAlign:"center",cursor:"pointer",fontSize:".68rem",color:a?"#e94560":"#7a8fa6",borderBottom:a?"3px solid #e94560":"3px solid transparent",fontWeight:a?700:400,whiteSpace:"nowrap"}),
+    gt:{display:"flex",gap:8,padding:"7px 12px",background:"#16213e",borderBottom:"1px solid #2a3a5c"},
+    gtB:(a)=>({flex:1,padding:"6px",border:`1.5px solid ${a?"#e94560":"#2a3a5c"}`,background:a?"#e94560":"transparent",color:a?"#fff":"#a0b4d0",borderRadius:8,cursor:"pointer",fontSize:".78rem",fontWeight:a?700:400}),
+    area:{flex:1,overflowY:"auto",padding:"10px 12px",display:"flex",flexDirection:"column",gap:8,height:"calc(100vh - 260px)"},
+    bot:{maxWidth:"90%",padding:"10px 12px",borderRadius:14,fontSize:".83rem",lineHeight:1.65,background:"#16213e",border:"1px solid #2a3a5c",alignSelf:"flex-start",color:"#d0e0f0",whiteSpace:"pre-wrap"},
+    usr:{maxWidth:"90%",padding:"10px 12px",borderRadius:"14px 14px 4px 14px",fontSize:".83rem",lineHeight:1.65,background:"#e94560",color:"#fff",alignSelf:"flex-end"},
+    qrW:{display:"flex",flexWrap:"wrap",gap:5,padding:"6px 10px",background:"#16213e",borderTop:"1px solid #2a3a5c"},
+    qrB:{padding:"5px 9px",background:"transparent",border:"1.5px solid #e94560",color:"#e94560",borderRadius:18,cursor:"pointer",fontSize:".7rem",whiteSpace:"nowrap"},
+    inR:{display:"flex",gap:7,padding:"8px 10px",background:"#16213e",borderTop:"1px solid #2a3a5c"},
+    inp:{flex:1,padding:"9px 12px",borderRadius:20,border:"1.5px solid #2a3a5c",background:"#0f1929",color:"#eee",fontSize:".83rem",outline:"none",direction:"rtl",fontFamily:"inherit"},
+    snd:{padding:"9px 15px",background:"#e94560",border:"none",color:"#fff",borderRadius:20,cursor:"pointer",fontSize:".85rem",fontWeight:700},
+    bdg:(v)=>({display:"inline-block",padding:"2px 7px",borderRadius:10,fontSize:".67rem",fontWeight:700,marginTop:3,background:bClr[v],color:bTxt[v]}),
+    dfc:{background:"#0f1929",border:"1px solid #2a3a5c",borderRadius:10,padding:"8px 10px",marginBottom:4},
+    iB:{background:"#0f1929",borderRight:"3px solid #e94560",borderRadius:"0 8px 8px 0",padding:"8px 11px",margin:"4px 0",fontSize:".81rem",lineHeight:1.7,color:"#c0d0e0"},
+    qC:{background:"#0f1929",border:"1.5px solid #2a3a5c",borderRadius:12,padding:12},
+    qO:(st)=>({width:"100%",padding:"8px 12px",border:`1.5px solid ${st==="correct"?"#2ed573":st==="wrong"?"#ff4757":"#2a3a5c"}`,background:st==="correct"?"#1a4a2a":st==="wrong"?"#4a1a1a":"transparent",color:st==="correct"?"#2ed573":st==="wrong"?"#ff4757":"#a0b4d0",borderRadius:9,cursor:"pointer",textAlign:"right",fontSize:".8rem",marginBottom:6,fontFamily:"inherit"}),
+    crt:{background:"#0f1929",border:"2px solid #e94560",borderRadius:16,padding:"16px 14px",textAlign:"center",margin:"8px 0"},
+    tip:{background:"linear-gradient(135deg,#0f2a1a,#0f1929)",border:"1.5px solid #2ed573",borderRadius:12,padding:12,margin:"4px 0"},
+    prW:{background:"#2a3a5c",borderRadius:10,height:7,margin:"5px 0"},
+    prB:(p)=>({height:7,borderRadius:10,background:"linear-gradient(90deg,#e94560,#a8edea)",width:`${p}%`,transition:"width .4s"}),
+    nmW:{background:"#0f1929",border:"1.5px solid #2a3a5c",borderRadius:12,padding:14,margin:"8px 0"},
+  };
+
+  const QRs=["AQL إيه هو؟","خطوات الفحص","Critical vs Major","حجم العينة","مصطلحات الجودة","أدوات الفحص","رسالة الفريق","فرق الأقمشة 🧵","حساب GSM","ما هو ISO 9001؟"];
+
+  return(
+    <div style={st.wrap}>
+      <div style={st.hdr}>
+        <div style={st.logo}>النظافة أساس الجودة ✦</div>
+        <div style={st.h1}>🤖 AQL Assistant — by Hassan</div>
+        <div style={st.sub}>مدير الجودة | Alpha Omega Egypt</div>
+      </div>
+      <div style={st.tabs}>
+        {[["chat","💬 شات"],["defects","👔 عيوب"],["quiz","🎯 اختبار"],["clean","🧹 نظافة"],["tip","💡 نصيحة"]].map(([id,lb])=>(
+          <div key={id} style={st.tab(tab===id)} onClick={()=>{setTab(id);if(id==="quiz"&&!quizState.active&&!quizState.done)startQuiz();}}>{lb}</div>
+        ))}
+      </div>
+      {(tab==="chat"||tab==="defects")&&<div style={st.gt}>
+        <button style={st.gtB(garment==="jacket")} onClick={()=>setGarment("jacket")}>👔 جاكيت</button>
+        <button style={st.gtB(garment==="trouser")} onClick={()=>setGarment("trouser")}>👖 بنطلون</button>
+      </div>}
+
+      {tab==="chat"&&<>
+        <div style={st.area}>
+          {messages.map((m,i)=><div key={i} style={m.role==="user"?st.usr:st.bot}>{m.text}</div>)}
+          {loading&&<div style={{...st.bot,color:"#7a8fa6"}}>⏳ جاري التفكير...</div>}
+          <div ref={bottomRef}/>
+        </div>
+        <div style={st.qrW}>{QRs.map(b=><button key={b} style={st.qrB} onClick={()=>setInput(b)}>{b}</button>)}</div>
+        <div style={st.inR}>
+          <input style={st.inp} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="اسألني أي سؤال... 🤖"/>
+          <button style={st.snd} onClick={send}>➤</button>
+        </div>
+      </>}
+
+      {tab==="defects"&&(()=>{
+        const list=DEFECTS[garment];
+        const cr=list.filter(d=>d[2]==="Critical"),ma=list.filter(d=>d[2]==="Major"),mi=list.filter(d=>d[2]==="Minor");
+        return<div style={{...st.area,overflowY:"auto"}}>
+          <div style={st.bot}>📋 <b>عيوب {garment==="jacket"?"الجاكيت 👔":"البنطلون 👖"}</b> — إجمالي {list.length} عيب
+            {[["🔴 Critical",cr,"#ff4757"],["🟠 Major",ma,"#ff6b35"],["🟡 Minor",mi,"#ffa502"]].map(([lbl,arr,clr])=><div key={lbl}>
+              <div style={{color:clr,fontWeight:700,margin:"10px 0 5px"}}>{lbl} ({arr.length})</div>
+              {arr.map((d,i)=><div key={i} style={st.dfc}><div style={{fontWeight:700,fontSize:".83rem"}}>{d[0]}</div><div style={{color:"#7a8fa6",fontSize:".78rem"}}>{d[1]}</div><span style={st.bdg(d[2])}>{d[2]}</span></div>)}
+            </div>)}
+          </div>
+        </div>;
+      })()}
+
+      {tab==="quiz"&&(()=>{
+        if(showNameInput)return<div style={{...st.area,padding:16}}>
+          <div style={st.nmW}>
+            <div style={{fontWeight:700,color:"#e0e8f0",marginBottom:10,lineHeight:1.6}}>🎯 اختبار تفاعلي — {QUIZ.length} سؤال<br/><span style={{fontSize:".8rem",color:"#a0b4d0"}}>اكتب اسمك عشان تاخد شهادة لو عملت ≥80%</span></div>
+            <input style={{...st.inp,width:"100%",marginBottom:10,boxSizing:"border-box"}} value={nameInput} onChange={e=>setNameInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&beginQuiz()} placeholder="اكتب اسمك هنا..."/>
+            <button style={{...st.snd,width:"100%",borderRadius:10,padding:10}} onClick={beginQuiz}>✅ ابدأ الاختبار</button>
+          </div>
+        </div>;
+        if(quizState.done){
+          const pct=Math.round((quizState.score/QUIZ.length)*100);
+          const grade=pct>=90?"🏆 ممتاز":pct>=75?"🥇 جيد جداً":pct>=60?"👍 جيد":"📖 يحتاج مراجعة";
+          return<div style={{...st.area,overflowY:"auto"}}>
+            <div style={st.bot}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:"1.2rem",fontWeight:700,color:"#e94560",marginBottom:6}}>🎉 انتهى الاختبار!</div>
+                <div style={{fontSize:"2.2rem",fontWeight:700,color:"#e94560"}}>{quizState.score}/{QUIZ.length}</div>
+                <div style={{color:"#a8edea",fontSize:"1.1rem"}}>{pct}%</div>
+                <div style={{margin:"6px 0",fontSize:"1rem"}}>{grade}</div>
+                <div style={st.prW}><div style={st.prB(pct)}/></div>
+                {cert&&<div style={{...st.crt,marginTop:14}}>
+                  <div style={{fontSize:".95rem",fontWeight:700,color:"#e94560"}}>🎓 شهادة إتمام التدريب</div>
+                  <div style={{fontSize:".72rem",color:"#7a8fa6",margin:"3px 0 10px"}}>Alpha Omega Egypt — AQL System</div>
+                  <div style={{fontSize:".78rem",color:"#a0b4d0"}}>تشهد شركة Alpha Omega Egypt بأن</div>
+                  <div style={{fontSize:"1.2rem",fontWeight:700,color:"#a8edea",padding:"8px 0",borderTop:"1px solid #2a3a5c",borderBottom:"1px solid #2a3a5c",margin:"6px 0"}}>{cert.name}</div>
+                  <div style={{fontSize:".78rem",color:"#c0d0e0"}}>أتمّ بنجاح اختبار الجودة والفحص</div>
+                  <div style={{fontSize:"1.8rem",fontWeight:700,color:"#e94560",margin:"4px 0"}}>{cert.pct}%</div>
+                  <div style={{color:"#2ed573",fontWeight:600,marginBottom:8}}>{grade}</div>
+                  <div style={{fontSize:".7rem",color:"#7a8fa6"}}>📅 {cert.date} | ✍️ Hassan — مدير الجودة</div>
+                </div>}
+                <button style={{...st.snd,marginTop:12,borderRadius:10}} onClick={startQuiz}>🔄 اعمل الاختبار تاني</button>
+              </div>
+            </div>
+          </div>;
+        }
+        if(!quizState.active)return null;
+        const q=QUIZ[quizState.current];
+        const prog=Math.round((quizState.used.length/QUIZ.length)*100);
+        return<div style={{...st.area,overflowY:"auto"}}>
+          <div style={{background:"#16213e",border:"1px solid #2a3a5c",borderRadius:9,padding:"8px 12px",display:"flex",justifyContent:"space-between",fontSize:".78rem"}}>
+            <span>السؤال {quizState.used.length+1}/{QUIZ.length}</span>
+            <span>النقاط: <b style={{color:"#e94560",fontSize:"1rem"}}>{quizState.score}</b></span>
+          </div>
+          <div style={st.prW}><div style={st.prB(prog)}/></div>
+          <div style={st.qC}>
+            <div style={{fontWeight:700,color:"#e0e8f0",marginBottom:10,lineHeight:1.55,fontSize:".85rem"}}>❓ {q.q}</div>
+            {q.opts.map((o,i)=>{
+              let s="";
+              if(quizState.answered){if(i===q.ans)s="correct";else if(i===quizState.chosen)s="wrong";}
+              return<button key={i} style={st.qO(s)} disabled={quizState.answered} onClick={()=>{
+                if(quizState.answered)return;
+                const ok=i===q.ans;
+                setQuizState(prev=>({...prev,answered:true,score:prev.score+(ok?1:0),used:[...prev.used,prev.current],chosen:i}));
+              }}>{o}</button>;
+            })}
+            {quizState.answered&&<>
+              <div style={{padding:"8px 10px",borderRadius:8,background:quizState.chosen===q.ans?"#1a4a2a":"#4a1a1a",color:quizState.chosen===q.ans?"#2ed573":"#ff4757",fontSize:".78rem",fontWeight:600,lineHeight:1.5,marginTop:4}}>
+                {quizState.chosen===q.ans?"✅ صح!":"❌ غلط. الإجابة: "+q.opts[q.ans]}<br/>
+                <span style={{opacity:.85,fontWeight:400}}>{q.exp}</span>
+              </div>
+              <button style={{...st.qrB,marginTop:8}} onClick={nextQuiz}>➡️ التالي</button>
+            </>}
+          </div>
+        </div>;
+      })()}
+
+      {tab==="clean"&&<div style={{...st.area,overflowY:"auto"}}>
+        <div style={st.bot}>
+          <div style={{color:"#e94560",fontWeight:700,fontSize:"1rem",marginBottom:8}}>🧹 النظافة أساس الجودة</div>
+          <div style={st.iB}>
+            الجودة تبدأ من كل فرد فينا.<br/>
+            نظافتك الشخصية ونظافة مكانك هي أول خطوة في ضمان جودة المنتج.<br/>
+            <b>بيئة نظيفة = تركيز أكتر = أخطاء أقل = جودة أعلى</b><br/><br/>
+            شكراً لكل واحد في الفريق على التزامه 🙏
+          </div>
+          <br/>
+          <b>📸 الفرق بين ترابيزة نظيفة وغير نظيفة:</b>
+          <div style={{marginTop:10,borderRadius:10,overflow:"hidden",border:"2px solid #2ed573"}}>
+            <div style={{background:"#1a4a2a",height:120,display:"flex",alignItems:"center",justifyContent:"center",fontSize:40}}>✅</div>
+            <div style={{background:"#1a4a2a",color:"#2ed573",fontWeight:700,padding:"7px 12px",textAlign:"center",fontSize:".82rem"}}>✅ هكذا يجب أن تكون ترابيزتك — نظيفة ومرتبة</div>
+          </div>
+          <div style={{marginTop:8,borderRadius:10,overflow:"hidden",border:"2px solid #ff4757"}}>
+            <div style={{background:"#4a1a1a",height:120,display:"flex",alignItems:"center",justifyContent:"center",fontSize:40}}>❌</div>
+            <div style={{background:"#4a1a1a",color:"#ff4757",fontWeight:700,padding:"7px 12px",textAlign:"center",fontSize:".82rem"}}>❌ هذا يجب تجنبه — ترابيزة غير نظيفة = عيوب محتملة</div>
+          </div>
+          <div style={{...st.iB,borderColor:"#2ed573",marginTop:12,color:"#a8edea"}}>
+            💡 الصور الحقيقية للترابيزة النظيفة والمتسخة موجودة في الملف على GitHub
+          </div>
+        </div>
+      </div>}
+
+      {tab==="tip"&&(()=>{
+        const tip=TIPS[tipIdx%TIPS.length];
+        return<div style={{...st.area,overflowY:"auto"}}>
+          <div style={st.tip}>
+            <div style={{color:"#2ed573",fontWeight:700,fontSize:".92rem",marginBottom:6}}>{tip.icon} {tip.t}</div>
+            <div style={{color:"#c0d0e0",fontSize:".83rem",lineHeight:1.7}}>{tip.b}</div>
+          </div>
+          <div style={st.prW}><div style={st.prB(Math.round(((tipIdx%TIPS.length)+1)/TIPS.length*100))}/></div>
+          <div style={{color:"#7a8fa6",fontSize:".75rem",marginBottom:8}}>نصيحة {(tipIdx%TIPS.length)+1}/{TIPS.length}</div>
+          <button style={{...st.snd,borderRadius:10,alignSelf:"flex-start"}} onClick={()=>setTipIdx(t=>t+1)}>💡 نصيحة تانية</button>
+        </div>;
+      })()}
+    </div>
+  );
+}
