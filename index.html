@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,6 +15,42 @@
 </head>
 
 <body>
+
+<!-- Login Screen -->
+
+<div id="loginScreen" class="login-screen">
+
+<div class="login-box">
+
+<h1>🛡️ QAI</h1>
+
+<h3>Quality AI Academy</h3>
+
+<p>Empowering Teams Through AI & Quality Excellence</p>
+
+<input
+id="loginEmail"
+type="email"
+placeholder="Email">
+
+<input
+id="loginPassword"
+type="password"
+placeholder="Password">
+
+<button id="loginBtn">
+Login
+</button>
+
+<p id="loginMessage"></p>
+
+</div>
+
+</div>
+
+<!-- Main Platform -->
+
+<div id="platform" style="display:none;">
 
 <div id="overlay"></div>
 
@@ -34,11 +72,19 @@
 
 <li data-page="dashboard">🏠 Dashboard</li>
 
+<li data-page="members">👥 Members</li>
+
 <li data-page="ai">🤖 QAI Expert AI</li>
 
 <li data-page="defects">📸 Defect Library</li>
 
 <li data-page="measurements">📏 Measurements</li>
+
+<li data-page="quality">✅ Quality Culture</li>
+
+<li data-page="cleanliness">🧹 Cleanliness</li>
+
+<li data-page="suggestions">💡 Suggestions</li>
 
 <li data-page="profile">👤 Profile</li>
 
@@ -74,12 +120,15 @@
 
 <div class="hero">
 
-<h1>Quality AI Academy</h1>
+<h1>QAI</h1>
 
 <h3>Global Quality Learning Platform</h3>
 
 <p>
-Empowering Teams Through AI, Quality, Innovation and Continuous Improvement
+Empowering Teams Through AI,
+Quality,
+Innovation,
+and Continuous Improvement
 </p>
 
 <h2>Hassan Megahed</h2>
@@ -92,12 +141,12 @@ Empowering Teams Through AI, Quality, Innovation and Continuous Improvement
 
 <div class="card">
 <h3>👥 Team Members</h3>
-<p>0</p>
+<p id="membersCount">0</p>
 </div>
 
 <div class="card">
 <h3>🏆 Points</h3>
-<p>0</p>
+<p id="pointsCount">0</p>
 </div>
 
 <div class="card">
@@ -111,164 +160,3 @@ Empowering Teams Through AI, Quality, Innovation and Continuous Improvement
 </div>
 
 </div>
-
-<div class="panel">
-
-<h2>🎯 Mission</h2>
-
-<p>
-Build a world-class quality culture through AI-powered learning and teamwork.
-</p>
-
-</div>
-
-<div class="panel">
-
-<h2>🌍 Vision</h2>
-
-<p>
-Become a leading digital quality academy for manufacturing excellence.
-</p>
-
-</div>
-
-<div class="panel">
-
-<h2>🏅 Quality Standards</h2>
-
-<p>
-ISO 9001 • AQL • Lean Manufacturing • 5S • PDCA
-</p>
-
-</div>
-
-<div class="panel">
-
-<h2>🏆 Daily Motivation</h2>
-
-<p id="motivationText">
-Quality starts with attention to detail.
-</p>
-
-</div>
-
-</section>
-
-<!-- AI -->
-
-<section id="ai" class="page">
-
-<div class="panel">
-
-<h2>🤖 QAI Expert AI</h2>
-
-<div id="chatMessages"></div>
-
-<div class="chatArea">
-
-<input
-id="userInput"
-type="text"
-placeholder="Ask Anything">
-
-<button id="sendBtn">
-Send
-</button>
-
-</div>
-
-</div>
-
-</section>
-
-<!-- Defects -->
-
-<section id="defects" class="page">
-
-<div class="panel">
-
-<h2>📸 Jacket Defects</h2>
-
-<ul>
-
-<li>Open Seam</li>
-<li>Broken Stitch</li>
-<li>Oil Stain</li>
-<li>Puckering</li>
-<li>Shade Variation</li>
-
-</ul>
-
-<h2 style="margin-top:20px;">
-👖 Trouser Defects
-</h2>
-
-<ul>
-
-<li>Twisted Leg</li>
-<li>Uneven Waist</li>
-<li>Open Seam</li>
-<li>Skipped Stitch</li>
-
-</ul>
-
-</div>
-
-</section>
-
-<!-- Measurements -->
-
-<section id="measurements" class="page">
-
-<div class="panel">
-
-<h2>📏 Measurements Library</h2>
-
-<p>
-Jacket & Trouser Size Charts
-</p>
-
-</div>
-
-</section>
-
-<!-- Profile -->
-
-<section id="profile" class="page">
-
-<div class="panel">
-
-<h2>👤 Profile</h2>
-
-<div id="profileData">
-
-No Data Yet
-
-</div>
-
-</div>
-
-</section>
-
-<!-- Admin -->
-
-<section id="admin" class="page">
-
-<div class="panel">
-
-<h2>👨‍💼 Admin Panel</h2>
-
-<p>
-Hassan Megahed Dashboard
-</p>
-
-</div>
-
-</section>
-
-</div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
