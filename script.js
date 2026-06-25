@@ -290,8 +290,10 @@ async function sendMessage() {
 
         );
 
-        const data =
-            await response.json();
+       const data =
+await response.json();
+
+console.log(data);
 
         const reply =
             data.candidates?.[0]?.content?.parts?.[0]?.text
