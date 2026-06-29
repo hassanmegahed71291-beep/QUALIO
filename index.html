@@ -7,165 +7,49 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- شريط علوي -->
+  <!-- Header -->
   <header>
     <button id="menu-toggle">☰</button>
-    <h2 id="page-title"></h2>
+    <h2>QAI ONE</h2>
   </header>
 
   <!-- Sidebar -->
   <nav id="sidebar">
-    <div class="logo">QAI ONE</div>
     <ul>
-      <li id="menu-dashboard"><span>📊</span></li>
-      <li id="menu-reports"><span>📑</span></li>
-      <li id="menu-users"><span>👤</span></li>
-      <li id="menu-academy"><span>🎓</span></li>
-      <li id="menu-simulation"><span>🧩</span></li>
-      <li>
-        <span>🌐</span>
-        <select id="lang-switch" onchange="setLanguage(this.value)">
-          <option value="ar">العربية</option>
-          <option value="en">English</option>
-        </select>
-      </li>
+      <li>🎮 الألعاب الذكية</li>
+      <li>💡 أفكار إبداعية</li>
+      <li>📖 نصائح حياتية</li>
+      <li>🧩 محاكاة القرارات</li>
+      <li>📚 تعليم بالقصص</li>
+      <li>🤝 محاكاة العملاء</li>
+      <li>🎤 مساعد صوتي</li>
+      <li>🚀 ابتكار الأفكار</li>
+      <li>🔑 تسجيل دخول</li>
+      <li>📊 لوحة التفاعل</li>
+      <li>⭐ نظام النقاط</li>
+      <li>📢 إشعارات المدير</li>
+      <li>⚠️ إشعارات العيوب</li>
+      <li>📷 الكاميرا</li>
+      <li>📦 التعبئة والتغليف</li>
+      <li>📝 اقتراحات الفريق</li>
+      <li>🏆 مسابقات ثقافية</li>
+      <li>💬 اقتباسات تحفيزية</li>
+      <li>🤖 تعليم بالذكاء الاصطناعي</li>
+      <li>🌍 محتوى عالمي</li>
     </ul>
   </nav>
 
-  <!-- Dashboard -->
+  <!-- Main Content -->
   <main id="dashboard">
-    <div class="kpi-container">
-      <div class="kpi-card" id="kpi-inspections"></div>
-      <div class="kpi-card" id="kpi-passrate"></div>
-      <div class="kpi-card" id="kpi-defects"></div>
-      <div class="kpi-card" id="kpi-capa"></div>
-    </div>
-
-    <button id="action-btn"></button>
-
-    <div class="charts">
-      <canvas id="inspectionTrend"></canvas>
-      <canvas id="statusPie"></canvas>
-    </div>
-
-    <table class="recent">
-      <thead>
-        <tr>
-          <th id="th-id"></th>
-          <th id="th-product"></th>
-          <th id="th-supplier"></th>
-          <th id="th-status"></th>
-          <th id="th-result"></th>
-          <th id="th-date"></th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <h1>لوحة التحكم الرئيسية</h1>
+    <p>هنا هيظهر المحتوى الخاص بكل قسم لما نربطه بالوظائف لاحقًا.</p>
   </main>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- JavaScript -->
   <script>
-    const messages = {
-      ar: {
-        title: "لوحة التحكم",
-        menu: {dashboard:"الرئيسية",reports:"التقارير",users:"المستخدمين",academy:"الأكاديمية",simulation:"المحاكاة"},
-        kpi: {inspections:"📊 إجمالي الفحوصات: 1248",passrate:"✅ نسبة النجاح: 96.7%",defects:"❌ العيوب المكتشفة: 342",capa:"⚠️ حالات مفتوحة: 18"},
-        button: "ابدأ الفحص",
-        table: {id:"الرقم",product:"المنتج",supplier:"المورد",status:"الحالة",result:"النتيجة",date:"التاريخ"}
-      },
-      en: {
-        title: "Dashboard",
-        menu: {dashboard:"Dashboard",reports:"Reports",users:"Users",academy:"Academy",simulation:"Simulation"},
-        kpi: {inspections:"📊 Total Inspections: 1248",passrate:"✅ Pass Rate: 96.7%",defects:"❌ Defects Found: 342",capa:"⚠️ Open CAPA: 18"},
-        button: "Start Inspection",
-        table: {id:"ID",product:"Product",supplier:"Supplier",status:"Status",result:"Result",date:"Date"}
-      }
-    };
-
-    let inspectionsData = [
-      {id:"INS-2024-1250", product:"Wireless Earbuds X1", supplier:"ABC Electronics", status:"Completed", result:"Pass", date:"May 31"},
-      {id:"INS-2024-1248", product:"LED Desk Lamp", supplier:"Bright Light Co.", status:"Completed", result:"Fail", date:"May 30"},
-      {id:"INS-2024-1247", product:"Smart Watch Z3", supplier:"TechTime Ltd.", status:"Pending", result:"-", date:"May 29"}
-    ];
-
-    function setLanguage(lang) {
-      document.getElementById("page-title").innerText = messages[lang].title;
-      document.getElementById("menu-dashboard").innerHTML = "📊 " + messages[lang].menu.dashboard;
-      document.getElementById("menu-reports").innerHTML = "📑 " + messages[lang].menu.reports;
-      document.getElementById("menu-users").innerHTML = "👤 " + messages[lang].menu.users;
-      document.getElementById("menu-academy").innerHTML = "🎓 " + messages[lang].menu.academy;
-      document.getElementById("menu-simulation").innerHTML = "🧩 " + messages[lang].menu.simulation;
-
-      document.getElementById("kpi-inspections").innerText = messages[lang].kpi.inspections;
-      document.getElementById("kpi-passrate").innerText = messages[lang].kpi.passrate;
-      document.getElementById("kpi-defects").innerText = messages[lang].kpi.defects;
-      document.getElementById("kpi-capa").innerText = messages[lang].kpi.capa;
-
-      document.getElementById("action-btn").innerText = messages[lang].button;
-
-      document.getElementById("th-id").innerText = messages[lang].table.id;
-      document.getElementById("th-product").innerText = messages[lang].table.product;
-      document.getElementById("th-supplier").innerText = messages[lang].table.supplier;
-      document.getElementById("th-status").innerText = messages[lang].table.status;
-      document.getElementById("th-result").innerText = messages[lang].table.result;
-      document.getElementById("th-date").innerText = messages[lang].table.date;
-    }
-
-    function renderTable() {
-      const tbody = document.querySelector("table.recent tbody");
-      tbody.innerHTML = "";
-      inspectionsData.forEach(item => {
-        const row = `<tr>
-          <td>${item.id}</td>
-          <td>${item.product}</td>
-          <td>${item.supplier}</td>
-          <td>${item.status}</td>
-          <td>${item.result}</td>
-          <td>${item.date}</td>
-        </tr>`;
-        tbody.innerHTML += row;
-      });
-    }
-
-    function updateCharts() {
-      const passed = inspectionsData.filter(i => i.result === "Pass").length;
-      const failed = inspectionsData.filter(i => i.result === "Fail").length;
-      const pending = inspectionsData.filter(i => i.status === "Pending").length;
-
-      const ctx1 = document.getElementById('inspectionTrend').getContext('2d');
-      new Chart(ctx1, {
-        type: 'line',
-        data: {
-          labels: ['May 1','May 10','May 20','May 30'],
-          datasets: [
-            { label: 'Inspections', data: [200, 300, 400, 348], borderColor: 'blue', fill: false },
-            { label: 'Defects', data: [50, 80, 60, 40], borderColor: 'red', fill: false }
-          ]
-        }
-      });
-
-      const ctx2 = document.getElementById('statusPie').getContext('2d');
-      new Chart(ctx2, {
-        type: 'pie',
-        data: {
-          labels: ['Passed','Failed','Pending'],
-          datasets: [{
-            data: [passed, failed, pending],
-            backgroundColor: ['green','red','orange']
-          }]
-        }
-      });
-    }
-
-    // افتراضي عربي
-    setLanguage("ar");
-    renderTable();
-    updateCharts();
-
-    // زر القائمة للموبايل
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
+
     menuToggle.addEventListener("click", () => {
       sidebar.classList.toggle("active");
     });
