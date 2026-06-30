@@ -124,5 +124,32 @@
     localStorage.setItem("points", currentPoints + 5);
   });
       </script>
-</body>
+</bod<section id="managerPanel">
+  <h2>📋 لوحة المدير - عرض الاقتراحات</h2>
+  <ul id="suggestionsList"></ul>
+</section>
+
+<script>
+  // تحميل الاقتراحات من التخزين المحلي وعرضها
+  function loadSuggestions(){
+    let allSuggestions = JSON.parse(localStorage.getItem("suggestions")) || [];
+    let list = document.getElementById("suggestionsList");
+    list.innerHTML = "";
+
+    if(allSuggestions.length === 0){
+      list.innerHTML = "<li>لا توجد اقتراحات حتى الآن</li>";
+    } else {
+      allSuggestions.forEach(function(s){
+        let li = document.createElement("li");
+        li.textContent = "👤 " + s.user + " اقترح: " + s.text;
+        list.appendChild(li);
+      });
+    }
+  }
+
+  // استدعاء عند تحميل الصفحة
+  window.onload = loadSuggestions;
+</script>
+  </body>
 </html>
+>
