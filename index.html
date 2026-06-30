@@ -150,6 +150,50 @@
   // استدعاء عند تحميل الصفحة
   window.onload = loadSuggestions;
 </script>
+  <script>
+const messages = {
+  ar: {
+    welcome: "مرحبا بك في منصة QAI ONE",
+    dashboard: "لوحة التحكم",
+    reports: "التقارير",
+    users: "إدارة المستخدمين",
+    notifications: "الإشعارات",
+    ideas: "الأفكار",
+    academy: "الأكاديمية",
+    simulation: "المحاكاة",
+    suggestions: "اقتراحات الفريق"
+  },
+  en: {
+    welcome: "Welcome to QAI ONE Platform",
+    dashboard: "Dashboard",
+    reports: "Reports",
+    users: "User Management",
+    notifications: "Notifications",
+    ideas: "Creative Ideas",
+    academy: "Academy",
+    simulation: "Simulation",
+    suggestions: "Team Suggestions"
+  }
+};
+
+function setLanguage(lang) {
+  // العنوان الرئيسي
+  document.querySelector("h1").innerText = messages[lang].welcome;
+
+  // عناصر القائمة الجانبية
+  document.querySelector("a[href='dashboard.html']").innerText = messages[lang].dashboard;
+  document.querySelector("a[href='reports.html']").innerText = messages[lang].reports;
+  document.querySelector("a[href='users.html']").innerText = messages[lang].users;
+  document.querySelector("a[href='notifications.html']").innerText = messages[lang].notifications;
+  document.querySelector("a[href='ideas.html']").innerText = messages[lang].ideas;
+  document.querySelector("a[href='academy.html']").innerText = messages[lang].academy;
+  document.querySelector("a[href='simulation.html']").innerText = messages[lang].simulation;
+  document.querySelector("a[href='#suggestions']").innerText = messages[lang].suggestions;
+}
+
+// الافتراضي: اللغة العربية
+setLanguage("ar");
+  </script>
   </body>
 </html>
->
+
