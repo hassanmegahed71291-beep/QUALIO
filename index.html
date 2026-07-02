@@ -7,16 +7,23 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- زر القائمة -->
-  <header>
-    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-    <h1 style="color:white; text-align:center; margin-top:50px;">
-      مرحبًا بك في منصة QUALIO
-    </h1>
-    <p style="color:gray; text-align:center;">
-      رحلة الجودة من الصفر إلى القمة
+  <!-- زر اللغة -->
+  <div class="lang-switch">
+    <button>English</button>
+    <button>العربية</button>
+  </div>
+
+  <!-- رسالة الترحيب مع الكرة الأرضية -->
+  <main class="welcome">
+    <div class="globe"></div>
+    <h1>QUALIO</h1>
+    <p class="founder">Founder & CEO – Hassan Megahed</p>
+    <p class="slogan">Welcome to QUALIO – Where Quality Meets Intelligence.</p>
+    <p class="desc">
+      Empowering Learning, Application, and AI-Driven Excellence to Advance Your Career.
     </p>
-  </header>
+    <button class="enter-btn">Enter Platform</button>
+  </main>
 
   <!-- القائمة الجانبية -->
   <aside class="sidebar">
@@ -34,6 +41,9 @@
       <li><a href="settings.html">⚙️ الإعدادات</a></li>
     </ul>
   </aside>
+
+  <!-- زر القائمة -->
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
 
   <script src="script.js"></script>
 </body>
